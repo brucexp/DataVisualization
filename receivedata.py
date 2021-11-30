@@ -318,7 +318,7 @@ def main():
             #print(count_tz)
             count_tz += 1
 
-    print(td_list2)
+    #print(td_list2)
 
 
 
