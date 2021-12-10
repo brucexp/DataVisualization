@@ -2,17 +2,17 @@ import socket
 import msvcrt
 import struct, time
 import threading
+import globalvar as gl
 # from ctypes import *
-
 from pynput import keyboard
 
 #全局变量
 isEnd = False
 Reply = b''
-Fatigue = 0
-BrainLoad = 0
-Attention = 0
-Alert = 0
+FatigueData = 0
+BrainLoadData = 0
+AttentionData = 0
+AlertData = 0
 
 
 def senddata(list, cmd):
@@ -124,12 +124,13 @@ def start_key_listen():
 
 def main():
     global Reply
-    global Fatigue
-    global BrainLoad
-    global Attention
-    global Alert
+    global FatigueData
+    global BrainLoadData
+    global AttentionData
+    global AlertData
+    global isEnd
         # recv_data = tcp_socket.recv(1024)  # 接收一个信息，并指定接收的大小 为1024字节
-
+    gl._init()
     tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 声明socket类型，同时生成链接对象
     # 2. 链接服务器
     server_addr = ('localhost', 9264)
@@ -266,62 +267,92 @@ def main():
     list_tdlb = [1,0] #订阅relative_power
     sent_pack_3byteArray = senddata(list_tdlb, cmd_tdlb)
     '''
-    send = 5500170200000001006f
+    sent_pack_3byteArray = 5500170200000001006f
     '''
     getlength3 = 298
     time.sleep(1)
     print("-------开始订阅指标--------")
-    Reply = b''
+    #Reply = b''
     tcp_socket.send(sent_pack_3byteArray)  # 发送一条信息 python3 只接收btye流
     time.sleep(2)  # 主线程停1秒
-    Reply = recvall(tcp_socket, getlength3)
-    reply_bytearray = bytearray(Reply)
-    print("The server said", type(Reply), Reply)
-    time.sleep(2)  # 主线程停1秒
-    print("------------------------------------")
-    #
-    # reply_bytearray = bytearray(Reply)
-    print(reply_bytearray.hex())
-    while not flag:
-        sum = 0
-        for i in range(297):
-            #print(i)
-            sum = sum + reply_bytearray[i]
-        while sum > 256 :
-            sum = sum - 256
-            print(sum)
-        if sum == reply_bytearray[297]:
-            print("校验成功，最后一位求和:",sum)
-            flag = True
-    """
-    55 00 16 22 01 00 00 01 00 
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-    97 16 C2 3E B2 01 B0 3E 11 42 4C 3D 2E 90 EA 3D 8E BA DF 3C 48 BE 8C 3D B1 24 FF 3D F7 D3 1B 3D 
-    39 BF 93 3E 5E 66 AE 3E FC 3A B5 3D 2F 4E 3F 3E 8F 5D 80 3D 36 0D E1 3D 18 5D 21 3E 61 4C D8 3C 
-    95 FC AB 3E 0F 95 F9 3E A3 76 C7 3C 27 55 76 3D 9D E1 DE 3C 59 06 55 3D 23 D5 BE 3D DF E6 BE 3C 
-    2C 0D 91 3E 58 9B FA 3E 51 A6 5C 3D BF D2 D9 3D 04 72 28 3C CF 72 5D 3D 3E 2A BD 3D D2 83 E9 3C 
-    68 1F 01 3F D7 96 9C 3E 0E 7E 86 3D 91 BE C4 3D 57 AF 1A 3C 03 83 1C 3D 77 19 91 3D 71 45 BB 3C 
-    05 C0 F5 3E 99 04 BD 3E AD 7F A5 3C 12 1E 30 3D 21 50 A7 3C FD E1 3E 3D F7 C3 AE 3D 22 6A B8 3C 
-    D2 C4 E9 3E C9 8A 82 3E E4 2B 6C 3D F2 20 B4 3D 02 A3 92 3C 01 06 9C 3D FE 0A F3 3D A1 95 A7 3D 
-    42 
-    """
-    td_list2 = []  # 先创建列表
-    count_tz = 0   # 特征数量
-    for i in range(9): # 9个通道
-        k = []
-        td_list2.append(k)
-        for j in range(8):  # 每个通道8个特征
-            #print(reply_bytearray[9 + count_tz * 4:13 + count_tz * 4])
-            templeData = struct.unpack('<f',reply_bytearray[9 + count_tz * 4:13 + count_tz * 4])
-            k.append(templeData[0])
-            #print(count_tz)
-            count_tz += 1
 
-    #print(td_list2)
-
-
-
+    while True:  #不断获取发过来数据
+        # time.sleep(1)
+        Reply = b''
+        Reply = recvall(tcp_socket, getlength3)
+        reply_bytearray = bytearray(Reply)
+        # print("The server said", type(Reply), Reply)
+        # time.sleep(2)  # 主线程停1秒
+        print("------------------------------------")
+        #
+        # reply_bytearray = bytearray(Reply)
+        # print(reply_bytearray.hex())
+        # while not flag:
+        #     sum = 0
+        #     for i in range(297):
+        #         #print(i)
+        #         sum = sum + reply_bytearray[i]
+        #     while sum > 256 : #忽略溢出
+        #         sum = sum - 256
+        #         #print(sum)
+        #     if sum == reply_bytearray[297]:
+        #         print("校验成功，最后一位求和:",sum)
+        #         flag = True
+        # flag = False
+        """
+        55 00 16 22 01 00 00 01 00 
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+        97 16 C2 3E B2 01 B0 3E 11 42 4C 3D 2E 90 EA 3D 8E BA DF 3C 48 BE 8C 3D B1 24 FF 3D F7 D3 1B 3D 
+        39 BF 93 3E 5E 66 AE 3E FC 3A B5 3D 2F 4E 3F 3E 8F 5D 80 3D 36 0D E1 3D 18 5D 21 3E 61 4C D8 3C 
+        95 FC AB 3E 0F 95 F9 3E A3 76 C7 3C 27 55 76 3D 9D E1 DE 3C 59 06 55 3D 23 D5 BE 3D DF E6 BE 3C 
+        2C 0D 91 3E 58 9B FA 3E 51 A6 5C 3D BF D2 D9 3D 04 72 28 3C CF 72 5D 3D 3E 2A BD 3D D2 83 E9 3C 
+        68 1F 01 3F D7 96 9C 3E 0E 7E 86 3D 91 BE C4 3D 57 AF 1A 3C 03 83 1C 3D 77 19 91 3D 71 45 BB 3C 
+        05 C0 F5 3E 99 04 BD 3E AD 7F A5 3C 12 1E 30 3D 21 50 A7 3C FD E1 3E 3D F7 C3 AE 3D 22 6A B8 3C 
+        D2 C4 E9 3E C9 8A 82 3E E4 2B 6C 3D F2 20 B4 3D 02 A3 92 3C 01 06 9C 3D FE 0A F3 3D A1 95 A7 3D 
+        42 
+        """
+        td_list2 = []  # 先创建列表
+        count_tz = 0   # 特征数量
+        for i in range(9): # 9个通道
+            k = []
+            td_list2.append(k)
+            for j in range(8):  # 每个通道8个特征
+                #print(reply_bytearray[9 + count_tz * 4:13 + count_tz * 4])
+                templeData = struct.unpack('<f',reply_bytearray[9 + count_tz * 4:13 + count_tz * 4])
+                k.append(templeData[0])
+                #print(count_tz)
+                count_tz += 1
+        #print(td_list2)
+        """
+        疲劳Fatigue：F3和F4通道theta功率的平均值 = (td_list2[2][1] + td_list2[3][1]) /2
+        脑负荷BrainLoad：P3和P4通道alpha功率的平均值 = (td_list2[4][3] + td_list2[5][3]) /2
+        注意力Attention：Cz通道beta功率 = td_list2[8][6]
+        警戒Alert：P3和P4通道Beta功率的平均值 = (td_list2[4][6] + td_list2[5][6]) /2
+        
+        0-A1 1-A2 2-F3 3-F4 4-p3 5-p4 6-O1 7-O2 8-Cz
+        relative_power[8] = [delta theta low_alpha alpha SMR low_beta beta gamma]   0 1 3 6 7 位相加应该为1，表示解析数据正确
+        """
+        FatigueData = (td_list2[2][1] + td_list2[3][1]) /2
+        BrainLoadData = (td_list2[4][3] + td_list2[5][3]) /2
+        AttentionData = td_list2[8][6]
+        AlertData = (td_list2[4][6] + td_list2[5][6]) /2
+        # listData = []
+        # listData.append(FatigueData)
+        # listData.append(BrainLoadData)
+        # listData.append(AttentionData)
+        # listData.append(AlertData)
+        gl.set_value('FatigueData',FatigueData)
+        gl.set_value('BrainLoadData', BrainLoadData)
+        gl.set_value('AttentionData', AttentionData)
+        gl.set_value('AlertData', AlertData)
+        print("------------子线程中原始解析出数据----------------------")
+        print(AttentionData,FatigueData, BrainLoadData, AlertData)
+        #return listData
+        if isEnd:  #检测按键 ‘Esc’,若触发则退出
+            print(isEnd)
+            break
+    tcp_socket.close()
 
     print("------------")
     print("主线程结束了！")
@@ -331,8 +362,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-"""
-解析数据
-"""
 

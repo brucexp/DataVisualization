@@ -9,19 +9,23 @@ import qimage2ndarray
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot, QPoint, Qt, QTimer, QThread, pyqtSignal
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPolygonF
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout,QLabel
 import cv2
 import VideoRecod
 import sys, os
 import time
 from Ui_renjigongxiao import Ui_MainWindow
 import matplotlib
+import threading
+import globalvar as gl
+import receivedata
 
 matplotlib.use("Qt5Agg")
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+
 #全局变量
 
 Attention = False
@@ -31,6 +35,12 @@ Alert = False
 Emotion = False
 BrainMuscleCoordination = False
 ComprehensiveCognition = False
+
+FatigueData = 0
+BrainLoadData = 0
+AttentionData = 0
+AlertData = 0
+
 Count = 0
 Angle = -90
 Cap = cv2.VideoCapture(0)  #初始化摄像头
@@ -76,6 +86,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.dashboardList = [0, 0, 0, 0, 0, 0, 0]
         self.widget_2.setVisible(True)
         self.widget_3.setVisible(True)
+        self.angle = 0
+        self.angle2 = 0
+        self.angle3 = 0
+        self.angle4 = 0
         #self.mat
 
         # 显示"打开摄像头"前的图像
@@ -108,7 +122,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     '''
     设置仪表盘背景
     '''
-    def set_background_painter(self, angle):
+    def set_background_painter(self):
         global Attention
         global MentalFatigue
         global BrainLoad
@@ -119,6 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         global Angle
         global Count
 
+
         painter = QPainter(self)
         # self.scrollAreaWidgetContents.render(painter)
         painter.begin(self)
@@ -127,7 +142,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         painter.setPen(Qt.NoPen)
         #print(painter.device())
         yibiaopan_x = 120 #窗体位置
-        yibiaopan_y = 700
+        yibiaopan_y = 850
         # yibiaopan_x = 0#窗体位置
         # yibiaopan_y = 0
         yibiaopan_width = self.label.width()
@@ -156,9 +171,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if i:
                 painter.drawPixmap(yibiaopan_x + (yibiaopan_width + 10) * Count, yibiaopan_y , yibiaopan_width, yibiaopan_height, dashboard)
                 #self.drawspeedPoniter(Angle)
-                Angle = Angle + 0.1
-                if Angle > 90:
-                    Angle = -90
+                #Angle = Angle + 0.1
+                # if Angle > 90:
+                #     Angle = -90 #零值
                 Count += 1
         #print("Count",Count)
 
@@ -178,10 +193,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #print("pointer_w :",self.pointer_w)
         self.pointer_h =self.pointer.height()/6
 
-    def drawPointer(self, angle):
+    def drawPointer(self):
         #print(angle)
         global Count
-        self.angle = angle
+        global FatigueData
+        global BrainLoadData
+        global AttentionData
+        global AlertData
+        print("--------------------传回主函数值--------------------------")
+        FatigueData = gl.get_value('FatigueData')
+        BrainLoadData = gl.get_value('BrainLoadData')
+        AttentionData = gl.get_value('AttentionData')
+        AlertData = gl.get_value('AlertData')
+        print( AttentionData,FatigueData, BrainLoadData,AlertData)
+        self.fatigueAngle = -90 + FatigueData / (1 / 180)
+        self.brainLoadAngle = -90 + BrainLoadData / (1 / 180)
+        self.attentionAngle = -90 + AttentionData / (1 / 180)
+        self.alertAngle = -90 + AlertData / (1 / 180)
+        print('-------------------角度---------------')
+        print( self.attentionAngle + 90,self.fatigueAngle + 90, self.brainLoadAngle + 90, self.alertAngle+90)
+
+
         hourPoint = [QPoint(7,8), QPoint(-7,8), QPoint(0, -80)]
         #时钟指针颜色
         hourColor = QColor(200, 100, 0, 200)
@@ -194,9 +226,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             print(self.pointerList[i])
         pointer_x = 120 + (self.label.width() + 10) * (Count - 1) + self.label.width() / 2
         #print("pointer_x",pointer_x)
-        pointer_y = 700+ self.label.height()
+        pointer_y = 850 + self.label.height()
+
 
         if Count == 1:
+            if Attention:
+                self.angle = self.attentionAngle
+                self.label_2.setText("注意力")
+            if MentalFatigue:
+                self.angle = self.fatigueAngle
+                self.label_2.setText("精神疲劳")
+            if BrainLoad:
+                self.angle = self.brainLoadAngle
+                self.label_2.setText("脑负荷")
+            if Alert:
+                self.angle = self.alertAngle
+                self.label_2.setText("警戒")
+            self.label_3.setText("")
+            self.label_5.setText("")
+            self.label_6.setText("")
             painter = QPainter(self)
             painter.setPen(Qt.NoPen)  # 无轮廓线
             painter.setBrush(hourColor)  # 填充色
@@ -208,11 +256,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             painter.drawConvexPolygon(QPolygonF(hourPoint))
             painter.drawPixmap(-self.pointer_w / 2, -self.pointer_h, self.pointer_w, self.pointer_h, self.pointer)
             painter.restore()  # //恢复以前的坐标系状态
+            painter.drawText(self.pointerList[0], 600,"脑负荷")
             # drawPixmap(int x, int y, int width, int height, const QPixmap &pixmap)
             # This is an overloaded function.Draws the pixmap into the rectangle at position (x, y) with the given width and height.
             # print("hello")
 
         if Count == 2:
+            if Attention:
+                self.angle = self.attentionAngle
+                self.label_2.setText("注意力")
+                if MentalFatigue:
+                    self.angle2 = self.fatigueAngle
+                    self.label_3.setText("精神疲劳")
+                if BrainLoad:
+                    self.angle2 = self.brainLoadAngle
+                    self.label_3.setText("脑负荷")
+                if Alert:
+                    self.angle2 = self.alertAngle
+                    self.label_3.setText("警戒")
+            if not Attention and MentalFatigue:
+
+                self.angle = self.fatigueAngle
+                self.label_2.setText("精神疲劳")
+
+                if BrainLoad:
+                    self.angle2 = self.brainLoadAngle
+                    self.label_3.setText("脑负荷")
+                if Alert:
+                    self.angle2 = self.alertAngle
+                    self.label_3.setText("警戒")
+            if BrainLoad and Alert:
+                self.angle = self.brainLoadAngle
+                self.angle2 = self.alertAngle
+                self.label_2.setText("脑负荷")
+                self.label_3.setText("警戒")
+            self.label_5.setText("")
+            self.label_6.setText("")
+
+
             painter = QPainter(self)
             painter.setPen(Qt.NoPen)  # 无轮廓线
             painter.setBrush(hourColor)  # 填充色
@@ -233,12 +314,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             painter2.translate(self.pointerList[1], pointer_y)  # 将坐标放在表盘中间
             #painter.scale(side / 200, side / 200)
             painter2.save()  # 保存坐标系状态
-            painter2.rotate(self.angle)#roate()函数就是坐标的旋转函数。参数为顺时针角度
+            painter2.rotate(self.angle2)#roate()函数就是坐标的旋转函数。参数为顺时针角度
             painter2.drawConvexPolygon(QPolygonF(hourPoint))
             painter2.drawPixmap(-self.pointer_w/2 , -self.pointer_h, self.pointer_w, self.pointer_h, self.pointer)
             painter2.restore()  #//恢复以前的坐标系状态
 
         if Count == 3:
+            if not Attention:
+                self.angle = self.fatigueAngle
+                self.angle2 = self.brainLoadAngle
+                self.angle3 = self.alertAngle
+                self.label_2.setText("精神疲劳")
+                self.label_3.setText("脑负荷")
+                self.label_5.setText("警戒")
+            if not MentalFatigue:
+                self.angle = self.attentionAngle
+                self.angle2 = self.brainLoadAngle
+                self.angle3 = self.alertAngle
+                self.label_2.setText("注意力")
+                self.label_3.setText("脑负荷")
+                self.label_5.setText("警戒")
+            if not BrainLoad:
+                self.angle = self.attentionAngle
+                self.angle2 = self.fatigueAngle
+                self.angle3 = self.alertAngle
+                self.label_2.setText("注意力")
+                self.label_3.setText("精神疲劳")
+                self.label_5.setText("警戒")
+            if not Alert:
+                self.angle = self.attentionAngle
+                self.angle2 = self.fatigueAngle
+                self.angle3 = self.brainLoadAngle
+                self.label_2.setText("注意力")
+                self.label_3.setText("精神疲劳")
+                self.label_5.setText("脑负荷")
+            self.label_6.setText("")
             painter = QPainter(self)
             painter.setPen(Qt.NoPen)  # 无轮廓线
             painter.setBrush(hourColor)  # 填充色
@@ -259,7 +369,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             painter2.translate(self.pointerList[1], pointer_y)  # 将坐标放在表盘中间
             #painter.scale(side / 200, side / 200)
             painter2.save()  # 保存坐标系状态
-            painter2.rotate(self.angle)#roate()函数就是坐标的旋转函数。参数为顺时针角度
+            painter2.rotate(self.angle2)#roate()函数就是坐标的旋转函数。参数为顺时针角度
             painter2.drawConvexPolygon(QPolygonF(hourPoint))
             painter2.drawPixmap(-self.pointer_w/2 , -self.pointer_h, self.pointer_w, self.pointer_h, self.pointer)
             painter2.restore()  #//恢复以前的坐标系状态
@@ -271,12 +381,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             painter3.translate(self.pointerList[2], pointer_y)  # 将坐标放在表盘中间
             #painter.scale(side / 200, side / 200)
             painter3.save()  # 保存坐标系状态
-            painter3.rotate(self.angle)#roate()函数就是坐标的旋转函数。参数为顺时针角度
+            painter3.rotate(self.angle3)#roate()函数就是坐标的旋转函数。参数为顺时针角度
             painter3.drawConvexPolygon(QPolygonF(hourPoint))
             painter3.drawPixmap(-self.pointer_w/2 , -self.pointer_h, self.pointer_w, self.pointer_h, self.pointer)
             painter3.restore()  #//恢复以前的坐标系状态
 
         if Count == 4:
+            self.angle = self.attentionAngle
+            self.angle2 = self.fatigueAngle
+            self.angle3 = self.brainLoadAngle
+            self.angle4 = self.alertAngle
+            self.label_2.setText("注意力")
+            self.label_3.setText("精神疲劳")
+            self.label_5.setText("脑负荷")
+            self.label_6.setText("警戒")
             painter = QPainter(self)
             painter.setPen(Qt.NoPen)  # 无轮廓线
             painter.setBrush(hourColor)  # 填充色
@@ -296,7 +414,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             painter2.translate(self.pointerList[1], pointer_y)  # 将坐标放在表盘中间
             # painter.scale(side / 200, side / 200)
             painter2.save()  # 保存坐标系状态
-            painter2.rotate(self.angle)  # roate()函数就是坐标的旋转函数。参数为顺时针角度
+            painter2.rotate(self.angle2)  # roate()函数就是坐标的旋转函数。参数为顺时针角度
             painter2.drawConvexPolygon(QPolygonF(hourPoint))
             painter2.drawPixmap(-self.pointer_w / 2, -self.pointer_h, self.pointer_w, self.pointer_h, self.pointer)
             painter2.restore()  # //恢复以前的坐标系状态
@@ -308,7 +426,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             painter3.translate(self.pointerList[2], pointer_y)  # 将坐标放在表盘中间
             # painter.scale(side / 200, side / 200)
             painter3.save()  # 保存坐标系状态
-            painter3.rotate(self.angle)  # roate()函数就是坐标的旋转函数。参数为顺时针角度
+            painter3.rotate(self.angle3)  # roate()函数就是坐标的旋转函数。参数为顺时针角度
             painter3.drawConvexPolygon(QPolygonF(hourPoint))
             painter3.drawPixmap(-self.pointer_w / 2, -self.pointer_h, self.pointer_w, self.pointer_h, self.pointer)
             painter3.restore()  # //恢复以前的坐标系状态
@@ -320,7 +438,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             painter4.translate(self.pointerList[3], pointer_y)  # 将坐标放在表盘中间
             #painter.scale(side / 200, side / 200)
             painter4.save()  # 保存坐标系状态
-            painter4.rotate(self.angle)#roate()函数就是坐标的旋转函数。参数为顺时针角度
+            painter4.rotate(self.angle4)#roate()函数就是坐标的旋转函数。参数为顺时针角度
             painter4.drawConvexPolygon(QPolygonF(hourPoint))
             painter4.drawPixmap(-self.pointer_w/2 , -self.pointer_h, self.pointer_w, self.pointer_h, self.pointer)
             painter4.restore()  #//恢复以前的坐标系状态
@@ -551,8 +669,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #paintEvent(event)
         #self.set_img_on_label()
         global Angle
-        self.set_background_painter(Angle)
-        self.drawPointer(Angle)
+        self.set_background_painter()
+        self.drawPointer()
         # for i in self.dashboardList:
         #     if i:
         #         self.drawspeedPoniter(Angle)
@@ -611,6 +729,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             print("ComprehensiveCognition")
         else:
             ComprehensiveCognition = False
+        # receivedata.main()
+
 
     """
     视频显示及录屏功能
@@ -766,8 +886,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             time.sleep(1)
             Out.release()
 
-
-
     # def show_camera(self):
     #
     #     flag, self.image = self.cap.read()
@@ -853,8 +971,13 @@ class CameraWorkThread(QThread):
 
 if __name__ == "__main__":
     import sys
+    t_receiveData = threading.Thread(target = receivedata.main)
+    t_receiveData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
+    t_receiveData.start()
+    time.sleep(13)      #必须先获取到数据才能启用界面程序，否则崩溃
     app = QApplication(sys.argv)
     ui = MainWindow()
     ui.show()
+
     CameraWorkThread = CameraWorkThread()
     sys.exit(app.exec_())

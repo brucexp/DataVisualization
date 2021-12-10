@@ -2,7 +2,7 @@
   "header": {
     "comment": "eric project file for project renjigongxiao",
     "copyright": "Copyright (C) 2021 , ",
-    "saved": "2021-10-18, 17:02:30"
+    "saved": "2021-12-06, 17:01:24"
   },
   "project": {
     "AUTHOR": "",
@@ -56,7 +56,9 @@
       "MakeTestOnly": true
     },
     "MIXEDLANGUAGE": false,
-    "OTHERS": [],
+    "OTHERS": [
+      ".gitignore"
+    ],
     "OTHERTOOLSPARMS": {},
     "PACKAGERSPARMS": {},
     "PROGLANGUAGE": "Python3",
@@ -93,8 +95,45 @@
       "PackagesRoot": "",
       "RcSuffix": ""
     },
-    "VCS": "None",
-    "VCSOPTIONS": {},
+    "VCS": "Git",
+    "VCSOPTIONS": {
+      "add": [
+        ""
+      ],
+      "checkout": [
+        ""
+      ],
+      "commit": [
+        ""
+      ],
+      "diff": [
+        ""
+      ],
+      "export": [
+        ""
+      ],
+      "global": [
+        ""
+      ],
+      "history": [
+        ""
+      ],
+      "log": [
+        ""
+      ],
+      "remove": [
+        ""
+      ],
+      "status": [
+        ""
+      ],
+      "tag": [
+        ""
+      ],
+      "update": [
+        ""
+      ]
+    },
     "VCSOTHERDATA": {},
     "VERSION": "0.1"
   }
