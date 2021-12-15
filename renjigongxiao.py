@@ -10,8 +10,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot, QPoint, Qt, QTimer, QThread, pyqtSignal
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPolygonF
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout,QLabel
+from memory_pic import *
 import cv2
-import VideoRecod
+import base64
 import sys, os
 import time
 from Ui_renjigongxiao import Ui_MainWindow
@@ -46,7 +47,7 @@ Angle = -90
 Cap = cv2.VideoCapture(0)  #初始化摄像头
 S_flag = 0
 
-g_img = cv2.imread('bg1.jpg')
+# g_img = cv2.imread('D:\\testpyqt5\\renjigongxiao\\camera_not_open.png')
 
 Fps = Cap.get(cv2.CAP_PROP_FPS)  # 获取帧率
 width = int(Cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 一定要转int 否则是浮点数
@@ -54,12 +55,24 @@ height = int(Cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 # width = 640
 # height = 480
 size = (width, height)  # 大小
-print("Size:", size)
+#print("Size:", size)
 #Fourcc = cv2.VideoWriter_fourcc('I', '4', '2', '0')
 Fourcc = cv2.VideoWriter_fourcc('X','V','I','D')
 filename = time.strftime("%m-%d-%H-%M-%S") + '.avi'
 
 Out = None
+
+
+def get_pic(pic_code, pic_name):
+    image = open(pic_name, 'wb')
+    image.write(base64.b64decode(pic_code))
+    image.close()
+get_pic(camera_not_open_png,'camera_not_open.png')
+get_pic(yibiaopan2_png,'yibiaopan2.png')
+get_pic(Pointer_png,'Pointer.png')
+
+g_img = cv2.imread('camera_not_open.png')
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -119,6 +132,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.setWindowFlags(Qt.FramelessWindowHint)
         #创建一个指针
         self.set_pointer()
+
     '''
     设置仪表盘背景
     '''
@@ -141,15 +155,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(Qt.NoPen)
         #print(painter.device())
-        yibiaopan_x = 120 #窗体位置
-        yibiaopan_y = 850
+        yibiaopan_x = 160 #窗体位置
+        yibiaopan_y = 810
         # yibiaopan_x = 0#窗体位置
         # yibiaopan_y = 0
         yibiaopan_width = self.label.width()
         yibiaopan_height = self.label.height()
         #print(yibiaopan_x,yibiaopan_y,yibiaopan_width,yibiaopan_height)
         dashboard = QPixmap()
-        dashboard.load('D:/testpyqt5/renjigongxiao/仪表盘2.png')
+        dashboard.load('yibiaopan2.png')
         #print("dashboard :", dashboard.size())
         Count = 0
         self.dashboardList = [0, 0, 0, 0, 0, 0, 0]
@@ -188,7 +202,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def set_pointer(self):
         # self.label.setAttribute(Qt.WA_TranslucentBackground, True)  # 设置窗口真透明
         self.pointer = QPixmap()  #创建一个pixmap对象
-        self.pointer.load('D:/testpyqt5/renjigongxiao/Pointer.png')
+        self.pointer.load('Pointer.png')
         self.pointer_w =self.pointer.width()/6  #重新计算指针大小以匹配表盘大小,缩放比例为X倍
         #print("pointer_w :",self.pointer_w)
         self.pointer_h =self.pointer.height()/6
@@ -222,11 +236,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 计算大小以及坐标
         self.pointerList = [0, 0, 0, 0, 0, 0, 0] #存储指针中心坐标
         for i in range(Count):
-            self.pointerList[i] = 120 + (self.label.width() + 10) * i + self.label.width() / 2
+            self.pointerList[i] = 160 + (self.label.width() + 10) * i + self.label.width() / 2
             print(self.pointerList[i])
-        pointer_x = 120 + (self.label.width() + 10) * (Count - 1) + self.label.width() / 2
+        pointer_x = 160 + (self.label.width() + 10) * (Count - 1) + self.label.width() / 2
         #print("pointer_x",pointer_x)
-        pointer_y = 850 + self.label.height()
+        pointer_y = 810 + self.label.height()
 
 
         if Count == 1:
@@ -256,7 +270,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             painter.drawConvexPolygon(QPolygonF(hourPoint))
             painter.drawPixmap(-self.pointer_w / 2, -self.pointer_h, self.pointer_w, self.pointer_h, self.pointer)
             painter.restore()  # //恢复以前的坐标系状态
-            painter.drawText(self.pointerList[0], 600,"脑负荷")
+            #painter.drawText(self.pointerList[0], 600,"脑负荷")
             # drawPixmap(int x, int y, int width, int height, const QPixmap &pixmap)
             # This is an overloaded function.Draws the pixmap into the rectangle at position (x, y) with the given width and height.
             # print("hello")
@@ -840,12 +854,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # 关闭摄像头
     def closeCamera(self):
         global Cap, g_img
+        time.sleep(2)
         Cap.release()
         self.count_time = 0
         self.timer_camera.stop()   #停止计时器
         self.labelShowCamera.clear()
         self.buttonOpenCamera.setText('打开摄像头')
-
+        # g_img = cv2.imread('D:\\testpyqt5\\renjigongxiao\\camera_not_open.png')
+        g_img = cv2.imread('camera_not_open.png')
         g_img = cv2.cvtColor(g_img, cv2.COLOR_BGR2RGB)
         qimg = qimage2ndarray.array2qimage(g_img)
         self.labelShowCamera.setPixmap(QPixmap(qimg))
@@ -977,7 +993,8 @@ if __name__ == "__main__":
     time.sleep(13)      #必须先获取到数据才能启用界面程序，否则崩溃
     app = QApplication(sys.argv)
     ui = MainWindow()
+    ui.setFixedSize(1745,1058)
+    ui.setWindowTitle('认知力_V1.0.0')#标题栏
     ui.show()
-
     CameraWorkThread = CameraWorkThread()
     sys.exit(app.exec_())

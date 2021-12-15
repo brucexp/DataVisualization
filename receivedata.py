@@ -19,19 +19,19 @@ def senddata(list, cmd):
     tmp = list #空列表
     indice_bytes = bytearray(tmp)
     print("--------------数据区---------------------")
-    print(type(indice_bytes), "indice_bytes:",indice_bytes)
-    print(indice_bytes)
+    # print(type(indice_bytes), "indice_bytes:",indice_bytes)
+    # print(indice_bytes)
     print("-------------------------------------\n")
     data_len = len(indice_bytes)
     toSe = struct.pack('<I', data_len) #低位在前
     print("-------------数据区长度---------------")
-    print(toSe,type(toSe))
+    # print(toSe,type(toSe))
     print("-------------------------------------\n")
     sent_pack_length = 7
     # sent_pack = bytes(sent_pack_length)#sent_pack_length#
     sent_pack_byteArray = bytearray(sent_pack_length)
     print("-----------------初始化发送字节数组----------------")
-    print(sent_pack_byteArray)
+    # print(sent_pack_byteArray)
     print("-------------------------------------------\n")
     """发送字节数组赋值
     """
@@ -48,24 +48,24 @@ def senddata(list, cmd):
 
     print("-----------------包头字节数据与数据字节数组组合成发送字节数组---------")
     sent_pack_byteArray = sent_pack_byteArray + indice_bytes
-    print(sent_pack_byteArray)
+    # print(sent_pack_byteArray)
     print("------------------------------------\n")
 
     sent_pack_length = sent_pack_length + len(indice_bytes)
     print("-----------发送字节数组长度-------------")
-    print(sent_pack_length)
+    # print(sent_pack_length)
     print("------------------------------------\n")
     toCheck = 0
     '''校验位求和和
     '''
     for i in range(sent_pack_length):
-        print("sent_pack_byteArray[" + str(i) + "]", sent_pack_byteArray[i])
+        # print("sent_pack_byteArray[" + str(i) + "]", sent_pack_byteArray[i])
         toCheck = toCheck + sent_pack_byteArray[i]
-        print("tocheck:",toCheck)
-    print(toCheck)
+        # print("tocheck:",toCheck)
+    # print(toCheck)
     if toCheck > 256:
         toCheck = toCheck -256 #忽略溢出
-    print(toCheck)
+    # print(toCheck)
     sent_pack_byteArray.append(toCheck)
     sent_pack = sent_pack_byteArray.hex()
     print("-------------sent_pack--------------")
@@ -137,8 +137,8 @@ def main():
     # tcp_socket.settimeout(2)
     tcp_socket.connect(server_addr)
     reply0 = recvall(tcp_socket, 3996) #吸收掉有可能获取到的错误数据 3996字节
-    print(reply0.hex())
-    print("Client has been assigned socket name", tcp_socket.getsockname())
+    # print(reply0.hex())
+    # print("Client has been assigned socket name", tcp_socket.getsockname())
 
 
     """
@@ -152,7 +152,7 @@ def main():
 
     tcp_socket.send(sent_pack_byteArray)  # 发送一条信息 python3 只接收btye流
     Reply = recvall(tcp_socket, getlength)
-    print("The server said", type(Reply),Reply.hex())
+    # print("The server said", type(Reply),Reply.hex())
 
     #监听键盘线程
     t1 = threading.Thread(target = start_key_listen)
@@ -182,7 +182,7 @@ def main():
             tcp_socket.send(sent_pack_byteArray)
             Reply = recvall(tcp_socket, getlength)
             reply_bytearray = bytearray(Reply)
-            print("The server said", type(Reply), Reply.hex())
+            # print("The server said", type(Reply), Reply.hex())
     Reply = b''
     """
     STEP2:获取所有通道列表，核对是否所有需要通道都已满足，编号42
@@ -199,7 +199,7 @@ def main():
     Reply = recvall(tcp_socket, getlength2)
     time.sleep(1)  # 主线程停1秒
     reply_bytearray = bytearray(Reply)
-    print("The server said", type(Reply), Reply.hex())
+    # print("The server said", type(Reply), Reply.hex())
 
     while not flag:
         sum = 0
@@ -208,7 +208,7 @@ def main():
             sum = sum + reply_bytearray[i]
         while sum > 256 :
             sum = sum - 256
-            print(sum)
+            # print(sum)
         if sum == reply_bytearray[14]:
             print("校验成功，最后一位求和:",sum)
 
@@ -253,7 +253,7 @@ def main():
     for i in range(9):
         td = [chr(j) for j in td_list[i]]
         td_str = "".join(td)
-        print(td_str)
+        # print(td_str)
     print("---------核对通道结束---------")
 
     flag = False
