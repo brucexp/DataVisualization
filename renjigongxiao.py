@@ -20,6 +20,8 @@ import matplotlib
 import threading
 import globalvar as gl
 import receivedata
+import callForData
+import globavar_com as gl_com
 
 matplotlib.use("Qt5Agg")
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -103,6 +105,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.angle2 = 0
         self.angle3 = 0
         self.angle4 = 0
+        self.eeg_com = ''
         #self.mat
 
         # 显示"打开摄像头"前的图像
@@ -214,18 +217,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         global BrainLoadData
         global AttentionData
         global AlertData
-        print("--------------------传回主函数值--------------------------")
-        FatigueData = gl.get_value('FatigueData')
-        BrainLoadData = gl.get_value('BrainLoadData')
-        AttentionData = gl.get_value('AttentionData')
-        AlertData = gl.get_value('AlertData')
-        print( AttentionData,FatigueData, BrainLoadData,AlertData)
+        # print("--------------------传回主函数值--------------------------")
+        # FatigueData = gl.get_value('FatigueData')
+        # BrainLoadData = gl.get_value('BrainLoadData')
+        # AttentionData = gl.get_value('AttentionData')
+        # AlertData = gl.get_value('AlertData')
+        # print( AttentionData,FatigueData, BrainLoadData,AlertData)
         self.fatigueAngle = -90 + FatigueData / (1 / 180)
         self.brainLoadAngle = -90 + BrainLoadData / (1 / 180)
         self.attentionAngle = -90 + AttentionData / (1 / 180)
         self.alertAngle = -90 + AlertData / (1 / 180)
-        print('-------------------角度---------------')
-        print( self.attentionAngle + 90,self.fatigueAngle + 90, self.brainLoadAngle + 90, self.alertAngle+90)
+        # print('-------------------角度---------------')
+        # print( self.attentionAngle + 90,self.fatigueAngle + 90, self.brainLoadAngle + 90, self.alertAngle+90)
 
 
         hourPoint = [QPoint(7,8), QPoint(-7,8), QPoint(0, -80)]
@@ -950,6 +953,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
+        eeg_receiveData = threading.Thread(target = callForData.main)
+        eeg_receiveData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
+        eeg_receiveData.start()
+
         self.widget_2.setVisible(True)
         self.widget_2.mpl.start_dynamic_plot()
     
@@ -960,6 +967,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         # TODO: not implemented yet
         self.stop_save_video()
+    
+    @pyqtSlot(str)
+    def on_comboBox_activated(self, p0):
+        """
+        Slot documentation goes here.
+        
+        @param p0 DESCRIPTION
+        @type str
+        """
+        # TODO: not implemented yet
+        self.eeg_com = p0
+    
+    @pyqtSlot()
+    def on_pushButton_5_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+
+        # TODO: not implemented yet
+        gl_com._init()
+        gl_com.set_value("COM", self.eeg_com)
+        print(gl_com.get_value("COM"))
 
 class CameraWorkThread(QThread):
 
@@ -987,10 +1016,10 @@ class CameraWorkThread(QThread):
 
 if __name__ == "__main__":
     import sys
-    t_receiveData = threading.Thread(target = receivedata.main)
-    t_receiveData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
-    t_receiveData.start()
-    time.sleep(13)      #必须先获取到数据才能启用界面程序，否则崩溃
+    # t_receiveData = threading.Thread(target = receivedata.main)
+    # t_receiveData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
+    # t_receiveData.start()
+    # time.sleep(13)      #必须先获取到数据才能启用界面程序，否则崩溃
     app = QApplication(sys.argv)
     ui = MainWindow()
     ui.setFixedSize(1745,1058)

@@ -10,6 +10,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import globavar_eeg as gl_eeg
 # from matplotlib.pyplot import hold
 
 
@@ -52,21 +53,24 @@ class MyMplCanvas(FigureCanvas):
     def start_dynamic_plot(self, *args, **kwargs):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_figure)  # 每隔一段时间就会触发一次update_figure函数。
-        timer.start(1000)  # 触发的时间间隔为1秒。
+        timer.start(20)  # 触发的时间间隔为1秒。
 
     '''动态图的绘图逻辑可以在这里修改'''
 
     def update_figure(self):
         # Build a list of 4 random integers between 0 and 10 (both inclusive)
-        self.fig.suptitle('测试动态图')
-        l = [random.randint(0, 10) for i in range(4)]
-        self.axes.cla()
-        self.axes.plot([0, 1, 2, 3], l, 'r')
-
-        self.axes.set_ylabel('动态图：Y轴')
-        self.axes.set_xlabel('动态图：X轴')
-        self.axes.grid(True)
-        self.draw()
+        # self.fig.suptitle('测试动态图')
+        # l = [random.randint(0, 10) for i in range(4)]
+        # self.axes.cla()
+        # self.axes.plot([0, 1, 2, 3], l, 'r')
+        #
+        # self.axes.set_ylabel('动态图：Y轴')
+        # self.axes.set_xlabel('动态图：X轴')
+        # self.axes.grid(True)
+        # self.draw()
+        eeg_data = gl_eeg.get_value("eeg_data")
+        print("-------------------matplot---------------")
+        print(eeg_data)
 
 
 class MatplotlibWidget(QWidget):
