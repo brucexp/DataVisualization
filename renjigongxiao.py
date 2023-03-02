@@ -1026,7 +1026,7 @@ class CameraWorkThread(QThread):
                 #cv2.imshow("frame", frame)
                 Out.write(frame)
             if S_flag == 0:
-                break;
+                break
             if cv2.waitKey(1) & 0xFF == ord('q'):  # 若检测到按键 ‘q’，退出
                 break
         self.trigger.emit()
