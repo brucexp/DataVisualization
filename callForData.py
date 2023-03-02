@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-
 import serial  
 import string
 import random
@@ -33,14 +31,18 @@ def callfordata():
               rawdata1=ord(rawData.read())*256+ord(rawData.read())
               if(rawdata1>32768):
                 rawdata1=rawdata1-65536
-                gl_eeg.set_value('eeg_data',rawdata1)
-                print("-----------------callfordata--------")
-                print(rawdata1)
-              outlet.push_sample([rawdata1])
-              raw.append(rawdata1)#+'\n'
-              j = j + 1
-              if(j==512*second):
-                i = 2
+                # gl_eeg.set_value('eeg_data',rawdata1)
+                outlet.push_sample([rawdata1])
+                # print("-----------------callfordata--------")
+                # print(rawdata1)
+              # outlet.push_sample([rawdata1])
+              # print("-----------------callfordata--------")
+              # print(rawdata1)
+              # raw.append(rawdata1)#+'\n'
+              # print(raw)
+              # j = j + 1
+              # if(j==512*second):
+              #   i = 2
         #
         #
         # elif(c==b' '):

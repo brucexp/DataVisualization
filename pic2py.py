@@ -19,6 +19,6 @@ def pic2py(picture_names, py_name):
     f.close()
 
 if __name__ == '__main__':
-    pics = ["camera_not_open.png", "yibiaopan2.png", "Pointer.png"]
+    pics = ["camera_not_open.png", "yibiaopan2.png", "Pointer.png","start.png"]
     pic2py(pics, 'memory_pic')  # 将pics里面的图片写到 memory_pic.py 中
     print("ok")

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1745</width>
-    <height>1058</height>
+    <width>1777</width>
+    <height>1039</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>0</x>
       <y>29</y>
-      <width>141</width>
+      <width>211</width>
       <height>691</height>
      </rect>
     </property>
@@ -34,7 +34,7 @@
          <widget class="QCheckBox" name="checkBox">
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="layoutDirection">
@@ -59,7 +59,7 @@
          <widget class="QCheckBox" name="checkBox_2">
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="layoutDirection">
@@ -84,7 +84,7 @@
          <widget class="QCheckBox" name="checkBox_3">
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="layoutDirection">
@@ -109,7 +109,7 @@
          <widget class="QCheckBox" name="checkBox_4">
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="layoutDirection">
@@ -131,7 +131,7 @@
          <widget class="QCheckBox" name="checkBox_5">
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="layoutDirection">
@@ -156,7 +156,7 @@
          <widget class="QCheckBox" name="checkBox_6">
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="layoutDirection">
@@ -181,7 +181,7 @@
          <widget class="QCheckBox" name="checkBox_7">
           <property name="font">
            <font>
-            <pointsize>11</pointsize>
+            <pointsize>9</pointsize>
            </font>
           </property>
           <property name="layoutDirection">
@@ -228,9 +228,9 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>220</x>
       <y>30</y>
-      <width>1241</width>
+      <width>1551</width>
       <height>30</height>
      </rect>
     </property>
@@ -242,6 +242,11 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>7</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>打开摄像头</string>
@@ -256,6 +261,11 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>7</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>开始录像</string>
        </property>
@@ -263,6 +273,11 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_4">
+       <property name="font">
+        <font>
+         <pointsize>7</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>停止录像</string>
        </property>
@@ -290,78 +305,13 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>开始</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>暂停</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_7">
        <property name="font">
         <font>
-         <pointsize>11</pointsize>
+         <pointsize>7</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>请选择脑电环设备端口号：</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboBox">
-       <item>
-        <property name="text">
-         <string>COM1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>COM2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>COM3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>COM4</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>COM5</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>COM6</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>COM7</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>COM8</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_5">
-       <property name="text">
-        <string>确定</string>
+        <string>开始</string>
        </property>
       </widget>
      </item>
@@ -383,7 +333,7 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>220</x>
       <y>70</y>
       <width>1551</width>
       <height>651</height>
@@ -415,58 +365,11 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="label_8">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>60</width>
-           <height>16</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>脑电</string>
+        <widget class="MatplotlibWidget" name="widget_2" native="true">
+         <property name="enabled">
+          <bool>true</bool>
          </property>
         </widget>
-       </item>
-       <item>
-        <widget class="MatplotlibWidget" name="widget_2" native="true"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_9">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>60</width>
-           <height>16</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>外周电</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="MatplotlibWidget" name="widget_3" native="true"/>
        </item>
       </layout>
      </item>
@@ -475,10 +378,10 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>290</x>
       <y>750</y>
-      <width>111</width>
-      <height>21</height>
+      <width>161</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -493,10 +396,10 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>650</x>
       <y>750</y>
-      <width>111</width>
-      <height>21</height>
+      <width>171</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -511,10 +414,10 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>1090</x>
+      <x>1040</x>
       <y>750</y>
-      <width>101</width>
-      <height>21</height>
+      <width>191</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -529,10 +432,10 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>1490</x>
+      <x>1440</x>
       <y>750</y>
-      <width>111</width>
-      <height>21</height>
+      <width>181</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">

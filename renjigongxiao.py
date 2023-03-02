@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import qimage2ndarray
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot, QPoint, Qt, QTimer, QThread, pyqtSignal
-from PyQt5.QtGui import QPixmap, QPainter, QColor, QPolygonF
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout,QLabel
+from PyQt5.QtGui import QPixmap, QPainter, QColor, QPolygonF, QFont
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout, QLabel, QSplashScreen
 from memory_pic import *
 import cv2
 import base64
@@ -19,7 +19,8 @@ from Ui_renjigongxiao import Ui_MainWindow
 import matplotlib
 import threading
 import globalvar as gl
-import receivedata
+#import receivedata
+import testredata
 import callForData
 import globavar_com as gl_com
 
@@ -69,9 +70,11 @@ def get_pic(pic_code, pic_name):
     image = open(pic_name, 'wb')
     image.write(base64.b64decode(pic_code))
     image.close()
+
 get_pic(camera_not_open_png,'camera_not_open.png')
 get_pic(yibiaopan2_png,'yibiaopan2.png')
 get_pic(Pointer_png,'Pointer.png')
+get_pic(start_png,'start.png')
 
 g_img = cv2.imread('camera_not_open.png')
 
@@ -100,7 +103,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setQTimer()  # 开一个定时器来进行自动刷新屏幕
         self.dashboardList = [0, 0, 0, 0, 0, 0, 0]
         self.widget_2.setVisible(True)
-        self.widget_3.setVisible(True)
         self.angle = 0
         self.angle2 = 0
         self.angle3 = 0
@@ -217,16 +219,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         global BrainLoadData
         global AttentionData
         global AlertData
-        # print("--------------------传回主函数值--------------------------")
-        # FatigueData = gl.get_value('FatigueData')
-        # BrainLoadData = gl.get_value('BrainLoadData')
-        # AttentionData = gl.get_value('AttentionData')
-        # AlertData = gl.get_value('AlertData')
-        # print( AttentionData,FatigueData, BrainLoadData,AlertData)
-        self.fatigueAngle = -90 + FatigueData / (1 / 180)
-        self.brainLoadAngle = -90 + BrainLoadData / (1 / 180)
-        self.attentionAngle = -90 + AttentionData / (1 / 180)
-        self.alertAngle = -90 + AlertData / (1 / 180)
+        # FatigueData = 0
+        # BrainLoadData = 0
+        # AttentionData = 0
+        # AlertData = 0
+        #print("--------------------传回主函数值--------------------------")
+        FatigueData = gl.get_value('FatigueData')
+        BrainLoadData = gl.get_value('BrainLoadData')
+        AttentionData = gl.get_value('AttentionData')
+        AlertData = gl.get_value('AlertData')
+        #print( AttentionData,FatigueData, BrainLoadData,AlertData)
+        self.fatigueAngle = -90 + (FatigueData-0.064)* 150/ (1 / 180)
+        self.brainLoadAngle = -90 + (BrainLoadData-0.026) * 120/ (1 / 180)
+        self.attentionAngle = -90 + (AttentionData-0.040) *150/ (1 / 180)
+        self.alertAngle = -90 + (AlertData- 0.039)*100 / (1 / 180)
         # print('-------------------角度---------------')
         # print( self.attentionAngle + 90,self.fatigueAngle + 90, self.brainLoadAngle + 90, self.alertAngle+90)
 
@@ -240,11 +246,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pointerList = [0, 0, 0, 0, 0, 0, 0] #存储指针中心坐标
         for i in range(Count):
             self.pointerList[i] = 160 + (self.label.width() + 10) * i + self.label.width() / 2
-            print(self.pointerList[i])
+            #print(self.pointerList[i])
         pointer_x = 160 + (self.label.width() + 10) * (Count - 1) + self.label.width() / 2
         #print("pointer_x",pointer_x)
         pointer_y = 810 + self.label.height()
-
 
         if Count == 1:
             if Attention:
@@ -917,7 +922,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #     self.labelShowCamera.setScaledContents(True)
 
     def show_camera(self):
-
         global g_img, Cap
         self.count_time += 1
         #print("count_time", self.count_time)
@@ -953,9 +957,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        eeg_receiveData = threading.Thread(target = callForData.main)
-        eeg_receiveData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
-        eeg_receiveData.start()
+        # eeg_receiveData = threading.Thread(target = callForData.main)
+        # eeg_receiveData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
+        # eeg_receiveData.start()
 
         self.widget_2.setVisible(True)
         self.widget_2.mpl.start_dynamic_plot()
@@ -989,6 +993,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         gl_com._init()
         gl_com.set_value("COM", self.eeg_com)
         print(gl_com.get_value("COM"))
+        # t_callEegData = threading.Thread(target = callForData.callfordata)
+        # t_callEegData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
+        # t_callEegData.start()
+    
+    @pyqtSlot()
+    def on_pushButton_6_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        # TODO: not implemented yet
+        # t_callEegData = threading.Thread(target = callForData.callfordata)
+        # t_callEegData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
+        # t_callEegData.start()
 
 class CameraWorkThread(QThread):
 
@@ -1016,14 +1033,33 @@ class CameraWorkThread(QThread):
 
 if __name__ == "__main__":
     import sys
-    # t_receiveData = threading.Thread(target = receivedata.main)
-    # t_receiveData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
-    # t_receiveData.start()
-    # time.sleep(13)      #必须先获取到数据才能启用界面程序，否则崩溃
+    t_receiveData = threading.Thread(target = testredata.main)
+    t_receiveData.setDaemon(True)  # 把子线程t_receiveData设置为守护线程，必须在start()之前设置
+    t_receiveData.start()
     app = QApplication(sys.argv)
+    '''
+    启动画面-预先与脑电建立数据传输链接
+    '''
+    # get_pic(start_png, 'start.png')
+    splash = QSplashScreen(QPixmap("start.png"))
+    # 设置画面中的文字的字体
+    splash.setFont(QFont('Microsoft YaHei UI', 12))
+    # 显示画面
+    splash.show()
+    # 显示信息
+    splash.showMessage("程序初始化中... 0%", QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom, QtCore.Qt.black)
+    time.sleep(2)  # 模拟运算的时间
+    splash.showMessage("加载配置...30%", QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom, QtCore.Qt.black)
+    time.sleep(2)  # 模拟运算的时间
+    splash.showMessage("加载配置...60%", QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom, QtCore.Qt.black)
+    time.sleep(1)  # 模拟运算的时间
+    splash.showMessage("加载配置...90%", QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom, QtCore.Qt.black)
+    time.sleep(1)
+    splash.showMessage("加载配置...100%", QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom, QtCore.Qt.black)
+    time.sleep(10)  # 必须先获取到数据才能启用界面程序，否则崩溃
     ui = MainWindow()
     ui.setFixedSize(1745,1058)
-    ui.setWindowTitle('认知力_V1.0.0')#标题栏
+    ui.setWindowTitle('认知力_V1.0.1')#标题栏
     ui.show()
     CameraWorkThread = CameraWorkThread()
     sys.exit(app.exec_())

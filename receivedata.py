@@ -36,7 +36,7 @@ def senddata(list, cmd):
     """发送字节数组赋值
     """
     sent_pack_byteArray[0] = 0x55# 十六进制
-    sent_pack_byteArray[1] = 0x00
+    sent_pack_byteArray[1] = 0x01
     sent_pack_byteArray[2] = cmd # 十进制
     sent_pack_byteArray[3] = toSe[0]
     sent_pack_byteArray[4] = toSe[1]
@@ -317,9 +317,11 @@ def main():
         for i in range(9): # 9个通道
             k = []
             td_list2.append(k)
+            sum = 0
             for j in range(8):  # 每个通道8个特征
                 #print(reply_bytearray[9 + count_tz * 4:13 + count_tz * 4])
                 templeData = struct.unpack('<f',reply_bytearray[9 + count_tz * 4:13 + count_tz * 4])
+                sum = sum + templeData
                 k.append(templeData[0])
                 #print(count_tz)
                 count_tz += 1
